@@ -1,3 +1,5 @@
+
+
 Vector D:
 
 1 1 0 0 1 0 0 0 
@@ -127,3 +129,206 @@ Centroids:
 1 0 0 0 0 0 0 0 
 0 0 1 0 0 0 0 0 
 1 0 0 0 0 1 0 1 
+
+
+
+
+Vector D:
+
+1 0 0 0 
+0 1 0 0 
+1 0 1 1 
+
+Vector S:
+
+1.000000 0.000000 0.000000 0.000000 
+0.000000 1.000000 0.000000 0.000000 
+0.333333 0.000000 0.333333 0.333333 
+
+Vector S2:
+
+0.500000 0.000000 0.000000 0.000000 
+0.000000 1.000000 0.000000 0.000000 
+0.500000 0.000000 1.000000 1.000000 
+
+Transponsed vector S2:
+
+0.500000 0.000000 0.500000 
+0.000000 1.000000 0.000000 
+0.000000 0.000000 1.000000 
+0.000000 0.000000 1.000000 
+
+Vector C:
+
+0.500000 0.000000 0.500000 
+0.000000 1.000000 0.000000 
+0.166667 0.000000 0.833333 
+
+Vector C2:
+
+0.666667 0.000000 0.166667 0.166667 
+0.000000 1.000000 0.000000 0.000000 
+0.333333 0.000000 0.333333 0.333333 
+0.333333 0.000000 0.333333 0.333333 
+
+Vector Phi:
+
+0.500000 0.000000 0.166667 
+
+Delta value:
+
+0.777778
+
+Phi value:
+
+0.222222
+
+Number of clusters value:
+
+2.333333
+
+Average number of documents in cluster value:
+
+1.285714
+
+Vector collecting abilities:
+
+0.250000 0.000000 0.416667 
+
+Vector kernels:
+
+2 0 
+
+Clusters:
+
+2 1 
+0 
+
+
+Vector delta:
+
+0.666667 1.000000 0.333333 0.333333 
+
+Delta2 value:
+
+0.583333
+
+Frequency of terms in clusters:
+
+1 1 1 1 
+1 0 0 0 
+
+
+Total number of terms:
+
+2 1 1 1 
+
+The number of clusters that contain the term:
+
+2 1 1 1 
+
+The average frequency of terms in the clusters:
+
+1.000000 1.000000 1.000000 1.000000 
+
+Centroids:
+
+1 1 0 0 
+1 0 0 0 
+
+
+
+
+Vector D:
+
+1 1 
+1 0 
+
+Vector S:
+
+0.500000 0.500000 
+1.000000 0.000000 
+
+Vector S2:
+
+0.500000 1.000000 
+0.500000 0.000000 
+
+Transponsed vector S2:
+
+0.500000 0.500000 
+1.000000 0.000000 
+
+Vector C:
+
+0.750000 0.250000 
+0.500000 0.500000 
+
+Vector C2:
+
+0.750000 0.250000 
+0.500000 0.500000 
+
+Vector Phi:
+
+0.250000 0.500000 
+
+Delta value:
+
+0.625000
+
+Phi value:
+
+0.375000
+
+Number of clusters value:
+
+1.250000
+
+Average number of documents in cluster value:
+
+1.600000
+
+Vector collecting abilities:
+
+0.375000 0.250000 
+
+Vector kernels:
+
+0 
+
+Clusters:
+
+0 1 
+
+
+Vector delta:
+
+0.750000 0.500000 
+
+Delta2 value:
+
+0.625000
+
+Frequency of terms in clusters:
+
+2 1 
+
+
+Total number of terms:
+
+2 1 
+
+The number of clusters that contain the term:
+
+1 1 
+
+The average frequency of terms in the clusters:
+
+2.000000 1.000000 
+
+Centroids:
+
+1 0 
+
+

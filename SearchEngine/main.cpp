@@ -147,6 +147,17 @@ vector< vector<float> > transponseVector(vector< vector<float> > v)
     return vTransponse;
 }
 
+vector< vector<int> > transponseVector(vector< vector<int> > v)
+{
+    vector< vector<int> > vTransponse(v[0].size(), vector<int>(v.size()));
+    
+    for (size_t i = 0; i < v.size(); ++i)
+        for (size_t j = 0; j < v[0].size(); ++j)
+            vTransponse[j][i] = v[i][j];
+    
+    return vTransponse;
+}
+
 vector< vector<float> > vectorC(vector< vector<float> > S, vector< vector<float> > S2)
 {
     vector< vector<float> > C;
@@ -462,14 +473,8 @@ vector< vector<int> > vectorCentroids(vector< vector<int> > clusters, vector< ve
     return vectorCentroids;
 }
 
-int main()
+vector< vector<int> > vectorCentroidsFromVectorD(FILE *out, vector< vector<int> > D)
 {
-	FILE *in = fopen("/Users/ruslan/Developer/SearchEngine/SearchEngine/input.txt", "r");
-    vector< vector<int> > D = vectorDFrom(in);
-    fclose(in);
-    
-	FILE *out = fopen("/Users/ruslan/Developer/SearchEngine/SearchEngine/output.txt", "w");
-	
     fprintf(out, "Vector D:\n\n");
     outputDualVectorTo(out, D);
     
@@ -553,7 +558,62 @@ int main()
     vector< vector<int> > vCentroids = vectorCentroids(clusters, frequencyOfTermsInClusters, vDelta, averageFrequencyOfTermsInClusters, delta2V);
     outputDualVectorTo(out, vCentroids);
     
-	fclose(out);
+    return vCentroids;
+}
+
+vector< vector<int> > optimizedVectorCentroid(vector< vector<int> > vCentroids)
+{
+    vector< vector<int> > optimizedVCentroid;
+    
+    for (int i = 0; i < vCentroids.size(); i++) {
+        bool isInsignificantDocument = true;
+        for (int j = 0; j < vCentroids[i].size(); j++) {
+            if (vCentroids[i][j] == 1) {
+                isInsignificantDocument = false;
+                break;
+            }
+        }
+        if (isInsignificantDocument == false) {
+            optimizedVCentroid.push_back(vCentroids[i]);
+        }
+    }
+    
+    vector< vector<int> > transponseOptimizedVCentroid = transponseVector(optimizedVCentroid);
+    optimizedVCentroid.clear();
+    
+    for (int i = 0; i < transponseOptimizedVCentroid.size(); i++) {
+        bool isInsignificantDocument = true;
+        for (int j = 0; j < transponseOptimizedVCentroid[i].size(); j++) {
+            if (transponseOptimizedVCentroid[i][j] == 1) {
+                isInsignificantDocument = false;
+                break;
+            }
+        }
+        if (isInsignificantDocument == false) {
+            optimizedVCentroid.push_back(transponseOptimizedVCentroid[i]);
+        }
+    }
+    
+    return transponseVector(optimizedVCentroid);
+}
+
+int main()
+{
+	FILE *in = fopen("/Users/ruslan/Developer/SearchEngine/SearchEngine/input.txt", "r");
+    vector< vector<int> > D = vectorDFrom(in);
+    fclose(in);
+    
+	FILE *out = fopen("/Users/ruslan/Developer/SearchEngine/SearchEngine/output.txt", "w");
+	
+    vector< vector<int> > vCentroids;
+    do {
+        fprintf(out, "\n\n");
+        vCentroids = vectorCentroidsFromVectorD(out, optimizedVectorCentroid(D));
+        D = vCentroids;
+        fprintf(out, "\n\n");
+    } while (vCentroids.size() > 1);
+    
+    fclose(out);
  
 	return 0;
 }
