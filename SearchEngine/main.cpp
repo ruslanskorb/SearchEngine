@@ -597,6 +597,50 @@ vector< vector<int> > optimizedVectorCentroid(vector< vector<int> > vCentroids)
     return transponseVector(optimizedVCentroid);
 }
 
+int summOfElementsOfVector(vector<int> v)
+{
+    int sum = 0;
+    for (int i = 0; i < v.size(); i++) {
+        sum += v[i];
+    }
+    return sum;
+}
+
+vector< vector<int> >vectorDG(vector< vector<int> > D,vector<int> centroid)
+{
+    vector< vector<int> > DG;
+    
+    // calculate vector DG
+    
+    return DG;
+}
+
+vector< vector<int> > vectorSD(vector< vector<int> > DG, vector< vector<int> > D, vector<int> centroid)
+{
+    vector< vector<int> > SD;
+    
+    // calculate SD
+    
+    return SD;
+}
+
+vector<int> vectorWithMaxValueSD(vector< vector<int> > SD)
+{
+    int max = INT32_MIN;
+    int indexOfV = 0;
+    
+    for (int i = 0; i < SD.size(); i++) {
+        for (int j = 0; j < SD[i].size(); j++) {
+            if(SD[i][j] > max) {
+                max = SD[i][j];
+                indexOfV = i;
+            }
+        }
+    }
+    
+    return SD[indexOfV];
+}
+
 int main()
 {
 	FILE *in = fopen("/Users/ruslan/Developer/SearchEngine/SearchEngine/input.txt", "r");
