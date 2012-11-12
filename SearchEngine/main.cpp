@@ -606,39 +606,62 @@ int summOfElementsOfVector(vector<int> v)
     return sum;
 }
 
+vector<int> vectorOfSummOfTermsInVectorD(vector< vector<int> > D)
+{
+    vector<int> v;
+    
+    for (int i = 0; i < D.size(); i++) {
+        v.push_back(summOfElementsOfVector(D[i]));
+    }
+    
+    return v;
+}
+
 vector< vector<int> >vectorDG(vector< vector<int> > D,vector<int> centroid)
 {
     vector< vector<int> > DG;
     
-    // calculate vector DG
+    for (int i = 0; i < D.size(); i++) {
+        vector <int> v;
+        for (int j = 0; j < D[i].size(); j++) {
+            int l = centroid[i] == 1 ? 1 : 2;
+            v.push_back(l == D[i][j] ? 1 : 0);
+        }
+        DG.push_back(v);
+    }
     
     return DG;
 }
 
-vector< vector<int> > vectorSD(vector< vector<int> > DG, vector< vector<int> > D, vector<int> centroid)
+vector<float> vectorSD(vector< vector<int> > DG, vector< vector<int> > D, vector<int> centroid)
 {
-    vector< vector<int> > SD;
+    vector<float> SD;
     
-    // calculate SD
+    int sumCentroid = summOfElementsOfVector(centroid);
+    
+    for (int i = 0; i < DG.size(); i++) {
+        int sumDi = summOfElementsOfVector(D[i]);
+        int sumDGi = summOfElementsOfVector(DG[i]);
+        
+        float SDi = 2 * sumDGi / (sumDi + (float)(sumCentroid));
+        
+        SD.push_back(SDi);
+    }
     
     return SD;
 }
 
-vector<int> vectorWithMaxValueSD(vector< vector<int> > SD)
+float maxValueSD(vector<float> SD)
 {
-    int max = INT32_MIN;
-    int indexOfV = 0;
+    float maxValue = INT32_MIN;
     
     for (int i = 0; i < SD.size(); i++) {
-        for (int j = 0; j < SD[i].size(); j++) {
-            if(SD[i][j] > max) {
-                max = SD[i][j];
-                indexOfV = i;
-            }
+        if(SD[i] > maxValue) {
+            maxValue = SD[i];
         }
     }
     
-    return SD[indexOfV];
+    return maxValue;
 }
 
 int main()
@@ -656,8 +679,28 @@ int main()
         D = vCentroids;
         fprintf(out, "\n\n");
     } while (vCentroids.size() > 1);
+
+    fprintf(out, "\n\nSumm of Elements of centroid '0':\n\n");
+    int summ = summOfElementsOfVector(vCentroids[0]);
+    fprintf(out, "%d", summ);
+    
+    fprintf(out, "\n\nVector of summ of terms in vector D:\n\n");
+    vector<int> vectorOfSumm = vectorOfSummOfTermsInVectorD(D);
+    outputVectorTo(out, vectorOfSumm);
+    
+    fprintf(out, "\n\nVector DG:\n\n");
+    vector< vector<int> > DG = vectorDG(D, vCentroids[0]);
+    outputDualVectorTo(out, DG);
+    
+    fprintf(out, "\n\nVector SD:\n\n");
+    vector<float> SD = vectorSD(DG, D, vCentroids[0]);
+    outputVectorTo(out, SD);
+ 
+    fprintf(out, "\n\nMax value SD:\n\n");
+    float maxSD = maxValueSD(SD);
+    fprintf(out, "%f", maxSD);
     
     fclose(out);
- 
+    
 	return 0;
 }

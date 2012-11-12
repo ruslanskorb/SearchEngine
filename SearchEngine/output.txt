@@ -332,3 +332,25 @@ Centroids:
 1 0 
 
 
+
+
+Summ of Elements of centroid '0':
+
+1
+
+Vector of summ of terms in vector D:
+
+1 
+
+Vector DG:
+
+1 0 
+
+
+Vector SD:
+
+1.000000 
+
+Max value SD:
+
+1.000000
