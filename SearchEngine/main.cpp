@@ -676,29 +676,32 @@ int main()
     do {
         fprintf(out, "\n\n");
         vCentroids = vectorCentroidsFromVectorD(out, optimizedVectorCentroid(D));
+        
+        for (int i = 0; i < vCentroids.size(); i++) {
+            fprintf(out, "\n\nSumm of Elements of centroid '%d':\n\n", i);
+            int summ = summOfElementsOfVector(vCentroids[i]);
+            fprintf(out, "%d", summ);
+            
+            fprintf(out, "\n\nVector of summ of terms in vector D:\n\n");
+            vector<int> vectorOfSumm = vectorOfSummOfTermsInVectorD(D);
+            outputVectorTo(out, vectorOfSumm);
+            
+            fprintf(out, "\n\nVector DG:\n\n");
+            vector< vector<int> > DG = vectorDG(D, vCentroids[0]);
+            outputDualVectorTo(out, DG);
+            
+            fprintf(out, "\n\nVector SD:\n\n");
+            vector<float> SD = vectorSD(DG, D, vCentroids[0]);
+            outputVectorTo(out, SD);
+            
+            fprintf(out, "\n\nMax value SD:\n\n");
+            float maxSD = maxValueSD(SD);
+            fprintf(out, "%f", maxSD);
+        }
+        
         D = vCentroids;
-        fprintf(out, "\n\n");
+        fprintf(out, "\n\n------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
     } while (vCentroids.size() > 1);
-
-    fprintf(out, "\n\nSumm of Elements of centroid '0':\n\n");
-    int summ = summOfElementsOfVector(vCentroids[0]);
-    fprintf(out, "%d", summ);
-    
-    fprintf(out, "\n\nVector of summ of terms in vector D:\n\n");
-    vector<int> vectorOfSumm = vectorOfSummOfTermsInVectorD(D);
-    outputVectorTo(out, vectorOfSumm);
-    
-    fprintf(out, "\n\nVector DG:\n\n");
-    vector< vector<int> > DG = vectorDG(D, vCentroids[0]);
-    outputDualVectorTo(out, DG);
-    
-    fprintf(out, "\n\nVector SD:\n\n");
-    vector<float> SD = vectorSD(DG, D, vCentroids[0]);
-    outputVectorTo(out, SD);
- 
-    fprintf(out, "\n\nMax value SD:\n\n");
-    float maxSD = maxValueSD(SD);
-    fprintf(out, "%f", maxSD);
     
     fclose(out);
     
