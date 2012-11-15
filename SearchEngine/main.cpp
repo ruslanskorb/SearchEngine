@@ -103,7 +103,7 @@ vector< vector<float> > vectorS(vector< vector<int> > D)
         vector<float> columns;
 		for(int j = 0; j < D[i].size(); j++)
 		{
-			columns.push_back(D[i][j] / sumRows[i]);
+			columns.push_back(D[i][j] / ((float)(sumRows[i])) );
 		}
         S.push_back(columns);
 	}
@@ -128,7 +128,7 @@ vector< vector<float> > vectorS2(vector< vector<int> > D)
         vector<float> columns;
 		for(int j = 0; j < D[i].size(); j++)
 		{
-			columns.push_back(D[i][j] / sumColumns[j]);
+			columns.push_back(D[i][j] / ((float)(sumColumns[j])) );
 		}
         S2.push_back(columns);
 	}
@@ -475,7 +475,7 @@ vector< vector<int> > vectorCentroids(vector< vector<int> > clusters, vector< ve
 
 vector< vector<int> > vectorCentroidsFromVectorD(FILE *out, vector< vector<int> > D)
 {
-    fprintf(out, "Vector D:\n\n");
+    fprintf(out, "\n\nVector D:\n\n");
     outputDualVectorTo(out, D);
     
     fprintf(out, "\nVector S:\n\n");
@@ -664,6 +664,124 @@ float maxValueSD(vector<float> SD)
     return maxValue;
 }
 
+int indexOfDocumentWithMaxSD(vector<float> SD, float maxSD)
+{
+    int indexOfDocumentWithMaxSD = 0;
+    
+    for (int i = 0; i < SD.size(); i++) {
+        if (SD[i] == maxSD) {
+            indexOfDocumentWithMaxSD = i;
+            break;
+        }
+    }
+    
+    return indexOfDocumentWithMaxSD;
+}
+
+vector<int> vectorSearchTerms(int termsCount)
+{
+    vector<int> terms;
+    
+    int indexOfTerm = -2;
+    do {
+        printf("Enter index of term (break: '-1'): ");
+        scanf("%d", &indexOfTerm);
+        if (indexOfTerm > -1 && indexOfTerm < (termsCount - 1) ) {
+            terms.push_back(indexOfTerm);
+        } else if(indexOfTerm != -1) {
+            printf("Incorrect index!\n");
+        }
+    } while (indexOfTerm != -1);
+    
+    return terms;
+}
+
+vector<int> vectorCentroidForSearchTerms(vector<int> searchTerms, vector< vector<int> > vCentroids)
+{
+    int summCentroid = 0;
+    int maxSummCentroid = INT32_MIN;
+    int indexOfCentroid = 0;
+    for (int i = 0; i < vCentroids.size(); i++) {
+        for (int j = 0; j < searchTerms.size(); j++) {
+            summCentroid += vCentroids[i][searchTerms[j]];
+        }
+        if (summCentroid > maxSummCentroid) {
+            indexOfCentroid = i;
+            maxSummCentroid = summCentroid;
+        }
+        summCentroid = 0;
+    }
+    
+    return vCentroids[indexOfCentroid];
+}
+
+vector<int> generalVectorCentroid(vector< vector<int> > D)
+{
+    vector<int> generalV;
+    
+    vector<int> summTermsInAllDocuments;
+    int summ = 0;
+    
+    for (int i = 0; i < D[0].size(); i++) {
+        for (int j = 0; j < D.size(); j++) {
+            summ += D[j][i];
+        }
+        summTermsInAllDocuments.push_back(summ);
+        summ = 0;
+    }
+    
+    int totalSumTermsInAllDocuments = summOfElementsOfVector(summTermsInAllDocuments);
+    
+    float avg = totalSumTermsInAllDocuments / ( (float)(summTermsInAllDocuments.size()) );
+    
+    for (int i = 0; i < summTermsInAllDocuments.size(); i++) {
+        if (summTermsInAllDocuments[i] > avg) {
+            generalV.push_back(1);
+        } else {
+            generalV.push_back(0);
+        }
+    }
+    
+    return generalV;
+}
+
+int indexOfDocumentWithMaxSDForCentroids(FILE *out, vector< vector<int> > vCentroids, vector< vector<int> >D)
+{
+    fprintf(out, "\n\nSearch terms:\n\n");
+    vector<int> searchTerms = vectorSearchTerms( (int)(D[0].size()) );
+    outputVectorTo(out, searchTerms);
+    
+    fprintf(out, "\n\nVector centroid for search terms:\n\n");
+    vector<int> vectorCentroid = vectorCentroidForSearchTerms(searchTerms, vCentroids);
+    outputVectorTo(out, vectorCentroid);
+    
+    fprintf(out, "\n\nSumm of Elements of centroid:\n\n");
+    int summ = summOfElementsOfVector(vectorCentroid);
+    fprintf(out, "%d", summ);
+    
+    fprintf(out, "\n\nVector of summ of terms in vector D:\n\n");
+    vector<int> vectorOfSumm = vectorOfSummOfTermsInVectorD(D);
+    outputVectorTo(out, vectorOfSumm);
+    
+    fprintf(out, "\n\nVector DG:\n\n");
+    vector< vector<int> > DG = vectorDG(D, vectorCentroid);
+    outputDualVectorTo(out, DG);
+    
+    fprintf(out, "\n\nVector SD:\n\n");
+    vector<float> SD = vectorSD(DG, D, vectorCentroid);
+    outputVectorTo(out, SD);
+    
+    fprintf(out, "\n\nMax value SD:\n\n");
+    float maxSD = maxValueSD(SD);
+    fprintf(out, "%f", maxSD);
+    
+    fprintf(out, "\n\nIndex of document with max SD:\n\n");
+    int indexOfCentroid = indexOfDocumentWithMaxSD(SD, maxSD);
+    fprintf(out, "%d", indexOfCentroid);
+    
+    return maxSD;
+}
+
 int main()
 {
 	FILE *in = fopen("/Users/ruslan/Developer/SearchEngine/SearchEngine/input.txt", "r");
@@ -671,37 +789,19 @@ int main()
     fclose(in);
     
 	FILE *out = fopen("/Users/ruslan/Developer/SearchEngine/SearchEngine/output.txt", "w");
-	
-    vector< vector<int> > vCentroids;
-    do {
-        fprintf(out, "\n\n");
-        vCentroids = vectorCentroidsFromVectorD(out, optimizedVectorCentroid(D));
-        
-        for (int i = 0; i < vCentroids.size(); i++) {
-            fprintf(out, "\n\nSumm of Elements of centroid '%d':\n\n", i);
-            int summ = summOfElementsOfVector(vCentroids[i]);
-            fprintf(out, "%d", summ);
-            
-            fprintf(out, "\n\nVector of summ of terms in vector D:\n\n");
-            vector<int> vectorOfSumm = vectorOfSummOfTermsInVectorD(D);
-            outputVectorTo(out, vectorOfSumm);
-            
-            fprintf(out, "\n\nVector DG:\n\n");
-            vector< vector<int> > DG = vectorDG(D, vCentroids[0]);
-            outputDualVectorTo(out, DG);
-            
-            fprintf(out, "\n\nVector SD:\n\n");
-            vector<float> SD = vectorSD(DG, D, vCentroids[0]);
-            outputVectorTo(out, SD);
-            
-            fprintf(out, "\n\nMax value SD:\n\n");
-            float maxSD = maxValueSD(SD);
-            fprintf(out, "%f", maxSD);
-        }
-        
-        D = vCentroids;
-        fprintf(out, "\n\n------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-    } while (vCentroids.size() > 1);
+    
+    fprintf(out, "\n\nGeneral vector centroid:\n\n");
+    vector<int> generalVCentroid = generalVectorCentroid(D);
+    outputVectorTo(out, generalVCentroid);
+    
+    vector< vector<int> > vCentroids = vectorCentroidsFromVectorD(out, optimizedVectorCentroid(D));
+    
+//    while (vCentroids.size() > 2) {
+//        D = vCentroids;
+//        vCentroids = vectorCentroidsFromVectorD(out, optimizedVectorCentroid(D));
+//    }
+    
+    indexOfDocumentWithMaxSDForCentroids(out, vCentroids, D);
     
     fclose(out);
     
