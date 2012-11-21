@@ -459,7 +459,7 @@ vector< vector<int> > vectorCentroids(vector< vector<int> > clusters, vector< ve
 		vector<int> vectorCentroid;
 		for(int j = 0; j < averageFrequencyOfTermsInClusters.size(); j++)
 		{
-			if(frequencyOfTermsInClusters[i][j] * vDelta[j] >= averageFrequencyOfTermsInClusters[j] * delta2V)
+			if(frequencyOfTermsInClusters[i][j] * vDelta[j] >= averageFrequencyOfTermsInClusters[j] * delta2V * 0.5)
 			{
 				vectorCentroid.push_back(1);
 			}
@@ -564,21 +564,7 @@ vector< vector<int> > vectorCentroidsFromVectorD(FILE *out, vector< vector<int> 
 
 vector< vector<int> > optimizedVectorCentroid(vector< vector<int> > vCentroids)
 {
-    vector< vector<int> > optimizedVCentroid;
-    
-    for (int i = 0; i < vCentroids.size(); i++) {
-        bool isInsignificantDocument = true;
-        for (int j = 0; j < vCentroids[i].size(); j++) {
-            if (vCentroids[i][j] == 1) {
-                isInsignificantDocument = false;
-                break;
-            }
-        }
-        if (isInsignificantDocument == false) {
-            optimizedVCentroid.push_back(vCentroids[i]);
-        }
-    }
-    
+    vector< vector<int> > optimizedVCentroid = vCentroids;
     vector< vector<int> > transponseOptimizedVCentroid = transponseVector(optimizedVCentroid);
     optimizedVCentroid.clear();
     
@@ -699,24 +685,6 @@ vector<int> vectorSearchTerms(int termsCount)
 
 vector<int> vectorCentroidForSearchTerms(vector<int> searchTerms, vector< vector<int> > vCentroids)
 {
-    /*
-    int summCentroid = 0;
-    int maxSummCentroid = INT32_MIN;
-    int indexOfCentroid = 0;
-    for (int i = 0; i < vCentroids.size(); i++) {
-        for (int j = 0; j < searchTerms.size(); j++) {
-            summCentroid += vCentroids[i][searchTerms[j]];
-        }
-        if (summCentroid > maxSummCentroid) {
-            indexOfCentroid = i;
-            maxSummCentroid = summCentroid;
-        }
-        summCentroid = 0;
-    }
-    
-    return vCentroids[indexOfCentroid];
-     */
-    
     int sumProduct = 0;
     int sumSQSearch = 0;
     int sumSQCentroid = 0;
@@ -810,11 +778,11 @@ int indexOfDocumentWithMaxSDForCentroids(FILE *out, vector< vector<int> > vCentr
 
 int main()
 {
-	FILE *in = fopen("/Users/ruslan_skorb/Developer/SearchEngine/SearchEngine/input.txt", "r");
+	FILE *in = fopen("/Users/ruslan/Developer/SearchEngine/SearchEngine/input.txt", "r");
     vector< vector<int> > D = vectorDFrom(in);
     fclose(in);
     
-	FILE *out = fopen("/Users/ruslan_skorb/Developer/SearchEngine/SearchEngine/output.txt", "w");
+	FILE *out = fopen("/Users/ruslan/Developer/SearchEngine/SearchEngine/output.txt", "w");
     
     fprintf(out, "\n\nGeneral vector centroid:\n\n");
     vector<int> generalVCentroid = generalVectorCentroid(D);
@@ -822,10 +790,10 @@ int main()
     
     vector< vector<int> > vCentroids = vectorCentroidsFromVectorD(out, optimizedVectorCentroid(D));
     
-//    while (vCentroids.size() > 2) {
-//        D = vCentroids;
-//        vCentroids = vectorCentroidsFromVectorD(out, optimizedVectorCentroid(D));
-//    }
+    while (vCentroids.size() > 2) {
+        D = vCentroids;
+        vCentroids = vectorCentroidsFromVectorD(out, optimizedVectorCentroid(D));
+    }
     
     indexOfDocumentWithMaxSDForCentroids(out, vCentroids, D);
     
