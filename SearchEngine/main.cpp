@@ -8,6 +8,7 @@
 
 #include <cstdio>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 
@@ -698,6 +699,7 @@ vector<int> vectorSearchTerms(int termsCount)
 
 vector<int> vectorCentroidForSearchTerms(vector<int> searchTerms, vector< vector<int> > vCentroids)
 {
+    /*
     int summCentroid = 0;
     int maxSummCentroid = INT32_MIN;
     int indexOfCentroid = 0;
@@ -713,6 +715,30 @@ vector<int> vectorCentroidForSearchTerms(vector<int> searchTerms, vector< vector
     }
     
     return vCentroids[indexOfCentroid];
+     */
+    
+    int sumProduct = 0;
+    int sumSQSearch = 0;
+    int sumSQCentroid = 0;
+    float cos;
+    float maxCos = -100000;
+    int indexOfCentroidForSearchTerms = -1;
+    
+    for (int i = 0; i < vCentroids.size(); i++) {
+        for (int j = 0; j < searchTerms.size(); j++) {
+            sumProduct      += searchTerms[j]   * vCentroids[i][j];
+            sumSQSearch     += searchTerms[j]   * searchTerms[j];
+            sumSQCentroid   += vCentroids[i][j] * vCentroids[i][j];
+        }
+        cos = sumProduct / ( sqrt(sumSQSearch) * sqrt(sumSQCentroid) );
+        printf("%f\n", cos);
+        if (cos > maxCos) {
+            maxCos = cos;
+            indexOfCentroidForSearchTerms = i;
+        }
+    }
+    
+    return vCentroids[indexOfCentroidForSearchTerms];
 }
 
 vector<int> generalVectorCentroid(vector< vector<int> > D)
@@ -784,11 +810,11 @@ int indexOfDocumentWithMaxSDForCentroids(FILE *out, vector< vector<int> > vCentr
 
 int main()
 {
-	FILE *in = fopen("/Users/ruslan/Developer/SearchEngine/SearchEngine/input.txt", "r");
+	FILE *in = fopen("/Users/ruslan_skorb/Developer/SearchEngine/SearchEngine/input.txt", "r");
     vector< vector<int> > D = vectorDFrom(in);
     fclose(in);
     
-	FILE *out = fopen("/Users/ruslan/Developer/SearchEngine/SearchEngine/output.txt", "w");
+	FILE *out = fopen("/Users/ruslan_skorb/Developer/SearchEngine/SearchEngine/output.txt", "w");
     
     fprintf(out, "\n\nGeneral vector centroid:\n\n");
     vector<int> generalVCentroid = generalVectorCentroid(D);

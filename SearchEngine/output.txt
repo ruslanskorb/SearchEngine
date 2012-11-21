@@ -350,7 +350,7 @@ Centroids:
 
 Search terms:
 
-1 
+1 5 9 14 25 
 
 Vector centroid for search terms:
 
