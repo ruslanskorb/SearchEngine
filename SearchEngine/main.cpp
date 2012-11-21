@@ -12,6 +12,19 @@
 
 using namespace std;
 
+void outputTripleVectorTo(FILE* out, vector< vector< vector<int> > > v)
+{
+    for (int i = 0; i < v.size(); i++) {
+        for (int j = 0; j < v[i].size(); j++) {
+            for (int l = 0; l < v[i][j].size(); l++) {
+                fprintf(out, "%d ", v[i][j][l]);
+            }
+            fprintf(out, "\n");
+        }
+        fprintf(out, "\n\n");
+    }
+}
+
 void outputDualVectorTo(FILE* out, vector< vector<float> > v)
 {
     for (int i = 0; i < v.size(); i++) {
@@ -474,7 +487,7 @@ vector< vector<int> > vectorCentroids(vector< vector<int> > clusters, vector< ve
     return vectorCentroids;
 }
 
-vector< vector<int> > vectorCentroidsFromVectorD(FILE *out, vector< vector<int> > D)
+vector< vector<int> > vectorClustersFromVectorD(FILE *out, vector< vector<int> > D)
 {
     fprintf(out, "\n\nVector D:\n\n");
     outputDualVectorTo(out, D);
@@ -518,7 +531,7 @@ vector< vector<int> > vectorCentroidsFromVectorD(FILE *out, vector< vector<int> 
     fprintf(out, "\n\nAverage number of documents in cluster value:\n\n");
     float averageNumberOfDocumentsInClusterV = averageNumberOfDocumentsInClusterValue(deltaV);
     fprintf(out, "%f", averageNumberOfDocumentsInClusterV);
-
+    
     fprintf(out, "\n\nVector collecting abilities:\n\n");
     vector<float> P = vectorP(C, Phi, D);
     outputVectorTo(out, P);
@@ -530,6 +543,17 @@ vector< vector<int> > vectorCentroidsFromVectorD(FILE *out, vector< vector<int> 
     fprintf(out, "\n\nClusters:\n\n");
     vector< vector<int> > clusters = vectorClusters(C, kernels, P);
     outputDualVectorTo(out, clusters);
+    
+    return clusters;
+}
+
+vector< vector<int> > vectorCentroids(FILE *out, vector< vector<int> > D, vector< vector<int> > clusters)
+{
+    vector< vector<float> > S = vectorS(D);
+    vector< vector<float> > S2 = vectorS2(D);
+    vector< vector<float> > transponsedS2 = transponseVector(S2);
+    vector< vector<float> > C = vectorC(S, transponsedS2);
+    vector< vector<float> > C2 = vectorC2(S, transponsedS2);
     
     fprintf(out, "\n\nVector delta:\n\n");
     vector<float> vDelta = vectorDelta(C2);
@@ -683,13 +707,13 @@ vector<int> vectorSearchTerms(int termsCount)
     return terms;
 }
 
-vector<int> vectorCentroidForSearchTerms(vector<int> searchTerms, vector< vector<int> > vCentroids)
+int indexOfVectorCentroidsForSearchTerms(vector<int> searchTerms, vector< vector<int> > vCentroids)
 {
-    int sumProduct = 0;
-    int sumSQSearch = 0;
-    int sumSQCentroid = 0;
-    float cos;
-    float maxCos = -100000;
+    double sumProduct = 0.0;
+    double sumSQSearch = 0.0;
+    double sumSQCentroid = 0.0;
+    double cos;
+    double maxCos = -100000.0;
     int indexOfCentroidForSearchTerms = -1;
     
     for (int i = 0; i < vCentroids.size(); i++) {
@@ -706,7 +730,7 @@ vector<int> vectorCentroidForSearchTerms(vector<int> searchTerms, vector< vector
         }
     }
     
-    return vCentroids[indexOfCentroidForSearchTerms];
+    return indexOfCentroidForSearchTerms;
 }
 
 vector<int> generalVectorCentroid(vector< vector<int> > D)
@@ -739,41 +763,26 @@ vector<int> generalVectorCentroid(vector< vector<int> > D)
     return generalV;
 }
 
-int indexOfDocumentWithMaxSDForCentroids(FILE *out, vector< vector<int> > vCentroids, vector< vector<int> >D)
+vector< vector<int> > vectorCentroidsForSearchTerms(vector< vector< vector<int> > > vTreeCentroids, int indexOfVectorCentroids, vector<int> vectorClusters)
 {
-    fprintf(out, "\n\nSearch terms:\n\n");
-    vector<int> searchTerms = vectorSearchTerms( (int)(D[0].size()) );
-    outputVectorTo(out, searchTerms);
+    vector< vector<int> > vCentroidsForSearchTerms;
     
-    fprintf(out, "\n\nVector centroid for search terms:\n\n");
-    vector<int> vectorCentroid = vectorCentroidForSearchTerms(searchTerms, vCentroids);
-    outputVectorTo(out, vectorCentroid);
+    for (int i = 0; i < vectorClusters.size(); i++) {
+        vCentroidsForSearchTerms.push_back(vTreeCentroids[indexOfVectorCentroids][vectorClusters[i]]);
+    }
     
-    fprintf(out, "\n\nSumm of Elements of centroid:\n\n");
-    int summ = summOfElementsOfVector(vectorCentroid);
-    fprintf(out, "%d", summ);
+    return vCentroidsForSearchTerms;
+}
+
+vector< vector<int> > vectorClustersForSearchTerms(vector< vector< vector<int> > > vTreeClusters, int indexOfVectorCentroids, vector<int> vectorClusters)
+{
+    vector< vector<int> > vClustersForSearchTerms;
     
-    fprintf(out, "\n\nVector of summ of terms in vector D:\n\n");
-    vector<int> vectorOfSumm = vectorOfSummOfTermsInVectorD(D);
-    outputVectorTo(out, vectorOfSumm);
+    for (int i = 0; i < vectorClusters.size(); i++) {
+        vClustersForSearchTerms.push_back(vTreeClusters[indexOfVectorCentroids][vectorClusters[i]]);
+    }
     
-    fprintf(out, "\n\nVector DG:\n\n");
-    vector< vector<int> > DG = vectorDG(D, vectorCentroid);
-    outputDualVectorTo(out, DG);
-    
-    fprintf(out, "\n\nVector SD:\n\n");
-    vector<float> SD = vectorSD(DG, D, vectorCentroid);
-    outputVectorTo(out, SD);
-    
-    fprintf(out, "\n\nMax value SD:\n\n");
-    float maxSD = maxValueSD(SD);
-    fprintf(out, "%f", maxSD);
-    
-    fprintf(out, "\n\nIndex of document with max SD:\n\n");
-    int indexOfCentroid = indexOfDocumentWithMaxSD(SD, maxSD);
-    fprintf(out, "%d", indexOfCentroid);
-    
-    return maxSD;
+    return vClustersForSearchTerms;
 }
 
 int main()
@@ -784,18 +793,75 @@ int main()
     
 	FILE *out = fopen("/Users/ruslan/Developer/SearchEngine/SearchEngine/output.txt", "w");
     
+    fprintf(out, "\n\nSearch terms:\n\n");
+    vector<int> searchTerms = vectorSearchTerms( (int)(D[0].size()) );
+    outputVectorTo(out, searchTerms);
+    
     fprintf(out, "\n\nGeneral vector centroid:\n\n");
     vector<int> generalVCentroid = generalVectorCentroid(D);
     outputVectorTo(out, generalVCentroid);
     
-    vector< vector<int> > vCentroids = vectorCentroidsFromVectorD(out, optimizedVectorCentroid(D));
+    vector< vector< vector<int> > > vTreeCentroids;
+    vector< vector< vector<int> > > vTreeClusters;
+    
+    vector< vector<int> > vDocuments;
+    
+    for (int i = 0; i < D.size(); i++) {
+        vector<int> v;
+        v.push_back(i);
+        vDocuments.push_back(v);
+    }
+    
+    vTreeClusters.push_back(vDocuments);
+    vTreeCentroids.push_back(D);
+    
+    vector< vector<int> > vClusters     = vectorClustersFromVectorD(out, optimizedVectorCentroid(D));
+    vector< vector<int> > vCentroids    = vectorCentroids(out, optimizedVectorCentroid(D), vClusters);
+    vTreeClusters.push_back(vClusters);
+    vTreeCentroids.push_back(vCentroids);
     
     while (vCentroids.size() > 2) {
         D = vCentroids;
-        vCentroids = vectorCentroidsFromVectorD(out, optimizedVectorCentroid(D));
+        vClusters = vectorClustersFromVectorD(out, optimizedVectorCentroid(D));
+        vCentroids = vectorCentroids(out, optimizedVectorCentroid(D), vClusters);
+        vTreeClusters.push_back(vClusters);
+        vTreeCentroids.push_back(vCentroids);
     }
     
-    indexOfDocumentWithMaxSDForCentroids(out, vCentroids, D);
+    fprintf(out, "\n\nTree centroids:\n\n");
+    outputTripleVectorTo(out, vTreeCentroids);
+    
+    fprintf(out, "\n\nTree clusters:\n\n");
+    outputTripleVectorTo(out, vTreeClusters);
+    
+    vector< vector<int> > vCentroidsForSearchTerms  = vTreeCentroids[vTreeCentroids.size() - 1];
+    vector< vector<int> > vClustersForSearchTerms   = vTreeClusters[vTreeClusters.size() - 1];
+    
+    for (int i = ((int)(vTreeCentroids.size()) - 1); i >= 0; i--) {
+        fprintf(out, "\n\nvCentroidsForSearchTerms:\n\n");
+        outputDualVectorTo(out, vCentroidsForSearchTerms);
+        
+        fprintf(out, "\n\nvClustersForSearchTerms:\n\n");
+        outputDualVectorTo(out, vClustersForSearchTerms);
+        
+        int indexOfVCentroidForSearchTerms = indexOfVectorCentroidsForSearchTerms(searchTerms, vCentroidsForSearchTerms);
+        fprintf(out, "\n\nIndex of vector centroid for search terms:\n\n%d", indexOfVCentroidForSearchTerms);
+        
+        fprintf(out, "\n\nVector centroid for search terms:\n\n");
+        vector<int> vectorCentroid = vCentroidsForSearchTerms[indexOfVCentroidForSearchTerms];
+        outputVectorTo(out, vectorCentroid);
+        
+        if (i != 0) {
+            fprintf(out, "\n\nVector clusters for search terms:\n\n");
+            vector<int> vectorClusters = vClustersForSearchTerms[indexOfVCentroidForSearchTerms];
+            outputVectorTo(out, vectorClusters);
+            
+            vCentroidsForSearchTerms    = vectorCentroidsForSearchTerms(vTreeCentroids, i-1, vectorClusters);
+            vClustersForSearchTerms     = vectorClustersForSearchTerms(vTreeClusters, i-1, vectorClusters);
+        }
+        
+        fprintf(out, "\n\n");
+    }
     
     fclose(out);
     
