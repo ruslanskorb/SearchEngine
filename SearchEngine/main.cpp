@@ -709,6 +709,16 @@ vector<int> vectorSearchTerms(int termsCount)
 
 int indexOfVectorCentroidsForSearchTerms(vector<int> searchTerms, vector< vector<int> > vCentroids)
 {
+    vector<int> vSearchTerms;
+    
+    for (int i = 0; i < vCentroids[0].size(); i++) {
+        vSearchTerms.push_back(0);
+    }
+    
+    for (int i = 0; i < searchTerms.size(); i++) {
+        vSearchTerms[searchTerms[i]] = 1;
+    }
+    
     double sumProduct = 0.0;
     double sumSQSearch = 0.0;
     double sumSQCentroid = 0.0;
@@ -717,10 +727,10 @@ int indexOfVectorCentroidsForSearchTerms(vector<int> searchTerms, vector< vector
     int indexOfCentroidForSearchTerms = -1;
     
     for (int i = 0; i < vCentroids.size(); i++) {
-        for (int j = 0; j < searchTerms.size(); j++) {
-            sumProduct      += searchTerms[j]   * vCentroids[i][j];
-            sumSQSearch     += searchTerms[j]   * searchTerms[j];
-            sumSQCentroid   += vCentroids[i][j] * vCentroids[i][j];
+        for (int j = 0; j < vSearchTerms.size(); j++) {
+            sumProduct      += vSearchTerms[j]   * vCentroids[i][j];
+            sumSQSearch     += vSearchTerms[j]   * vSearchTerms[j];
+            sumSQCentroid   += vCentroids[i][j]  * vCentroids[i][j];
         }
         cos = sumProduct / ( sqrt(sumSQSearch) * sqrt(sumSQCentroid) );
         printf("%f\n", cos);
